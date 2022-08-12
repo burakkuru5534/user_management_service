@@ -33,3 +33,17 @@ func StrToInt64(aval string) int64 {
 	}
 	return i
 }
+
+var App *app
+
+type app struct {
+	DB *DbHandle
+}
+
+func InitApp(db *DbHandle) error {
+	App = &app{
+		DB: db,
+	}
+
+	return nil
+}
