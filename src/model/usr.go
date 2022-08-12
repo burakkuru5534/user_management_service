@@ -12,41 +12,43 @@ type Usr struct {
 func (u *Usr) Create() error {
 	db := helper.ConnectDb()
 
-	sq := "INSERT INTO usr (name, email, password) VALUES ($1, $2) RETURNING id"
-	_, err := db.Exec(sq, u.Name, u.Password)
+	sq := "INSERT INTO usr (name, email, password) VALUES ($1, $2, $3) RETURNING id"
+	err := db.QueryRow(sq, u.Name, u.Email, u.Password).Scan(&u.ID)
 	if err != nil {
 		return err
 	}
+	defer db.Close()
+
 	return nil
 }
 
-func (u *Usr) Update() error {
+func (u *Usr) Update(id int64) error {
 	db := helper.ConnectDb()
 
-	sq := "UPDATE usr SET name = $1, password = $2 WHERE id = $3"
-	_, err := db.Exec(sq, u.Name, u.Password, u.ID)
+	sq := "UPDATE usr SET name = $1, password = $2, email = $3 WHERE id = $4"
+	_, err := db.Exec(sq, u.Name, u.Password, u.Email, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *Usr) Delete() error {
+func (u *Usr) Delete(id int64) error {
 	db := helper.ConnectDb()
 
 	sq := "DELETE FROM usr WHERE id = $1"
-	_, err := db.Exec(sq, u.ID)
+	_, err := db.Exec(sq, id)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (u *Usr) Get() error {
+func (u *Usr) Get(id int64) error {
 	db := helper.ConnectDb()
 
-	sq := "SELECT id, name, password FROM usr WHERE id = $1"
-	err := db.QueryRow(sq, u.ID).Scan(&u.ID, &u.Name, &u.Password)
+	sq := "SELECT id, name, password, email FROM usr WHERE id = $1"
+	err := db.QueryRow(sq, id).Scan(&u.ID, &u.Name, &u.Password, &u.Email)
 	if err != nil {
 		return err
 	}
