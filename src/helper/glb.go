@@ -10,6 +10,20 @@ import (
 	"strings"
 )
 
+var App *app
+
+type app struct {
+	DB *DbHandle
+}
+
+func InitApp(db *DbHandle) error {
+	App = &app{
+		DB: db,
+	}
+
+	return nil
+}
+
 func BodyToJsonReq(r *http.Request, data interface{}) error {
 	body, err := ioutil.ReadAll(r.Body)
 	if err != nil {
@@ -34,16 +48,14 @@ func StrToInt64(aval string) int64 {
 	return i
 }
 
-var App *app
+func CheckIfUserExists(id int64) (bool, error) {
 
-type app struct {
-	DB *DbHandle
-}
+	var isExists bool
 
-func InitApp(db *DbHandle) error {
-	App = &app{
-		DB: db,
+	err := App.DB.Get(&isExists, "SELECT EXISTS (SELECT 1 FROM usr WHERE id = $1)", id)
+	if err != nil {
+		return false, err
 	}
+	return isExists, nil
 
-	return nil
 }

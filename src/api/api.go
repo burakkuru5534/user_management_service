@@ -16,7 +16,7 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 
 	err := helper.BodyToJsonReq(r, &usr)
 	if err != nil {
-		http.Error(w, "body to json request error.", http.StatusBadRequest)
+		http.Error(w, "{\"error\": \"Bad request\"}", http.StatusBadRequest)
 		return
 	}
 
@@ -26,12 +26,12 @@ func UserCreate(w http.ResponseWriter, r *http.Request) {
 		switch e := dberr.(type) {
 		case *dberror.Error:
 			if e.Code == "23505" {
-				http.Error(w, "Email already exists.", http.StatusForbidden)
+				http.Error(w, "{\"error\": \"User with that email already exists\"}", http.StatusForbidden)
 				return
 			}
 		}
 
-		http.Error(w, "create user error.", http.StatusInternalServerError)
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
 		return
 	}
 
@@ -55,15 +55,35 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	id := helper.StrToInt64(chi.URLParam(r, "id"))
 
-	err := helper.BodyToJsonReq(r, &usr)
+	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
-		http.Error(w, "body to json request error.", http.StatusBadRequest)
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
+		return
+	}
+
+	if !isExists {
+		http.Error(w, "{\"error\": \"User with that id does not exist\"}", http.StatusNotFound)
+		return
+	}
+
+	err = helper.BodyToJsonReq(r, &usr)
+	if err != nil {
+		http.Error(w, "{\"error\": \"Bad request\"}", http.StatusBadRequest)
 		return
 	}
 
 	err = usr.Update(id)
 	if err != nil {
-		http.Error(w, "update user error.", http.StatusInternalServerError)
+		dberr := dberror.GetError(err)
+		switch e := dberr.(type) {
+		case *dberror.Error:
+			if e.Code == "23505" {
+				http.Error(w, "{\"error\": \"User with that email already exists\"}", http.StatusForbidden)
+				return
+			}
+		}
+
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
 		return
 	}
 
@@ -86,9 +106,20 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	id := helper.StrToInt64(chi.URLParam(r, "id"))
 
-	err := usr.Delete(id)
+	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
-		http.Error(w, "delete user error.", http.StatusInternalServerError)
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
+		return
+	}
+
+	if !isExists {
+		http.Error(w, "{\"error\": \"User with that id does not exist\"}", http.StatusNotFound)
+		return
+	}
+
+	err = usr.Delete(id)
+	if err != nil {
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
 		return
 	}
 
@@ -102,9 +133,20 @@ func UserGet(w http.ResponseWriter, r *http.Request) {
 
 	id := helper.StrToInt64(chi.URLParam(r, "id"))
 
-	err := usr.Get(id)
+	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
-		http.Error(w, "get user error.", http.StatusInternalServerError)
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
+		return
+	}
+
+	if !isExists {
+		http.Error(w, "{\"error\": \"User with that id does not exist\"}", http.StatusNotFound)
+		return
+	}
+
+	err = usr.Get(id)
+	if err != nil {
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
 		return
 	}
 
@@ -127,7 +169,7 @@ func UserList(w http.ResponseWriter, r *http.Request) {
 
 	usrList, err := usr.GetAll()
 	if err != nil {
-		http.Error(w, "list user error.", http.StatusInternalServerError)
+		http.Error(w, "{\"error\": \"server error\"}", http.StatusInternalServerError)
 		return
 	}
 
