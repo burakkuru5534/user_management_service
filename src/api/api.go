@@ -5,7 +5,6 @@ import (
 	"example.com/m/v2/src/helper"
 	"example.com/m/v2/src/model"
 	"github.com/Shyp/go-dberror"
-	"github.com/go-chi/chi/v5"
 	_ "github.com/letsencrypt/boulder/db"
 	"net/http"
 )
@@ -53,7 +52,8 @@ func UserUpdate(w http.ResponseWriter, r *http.Request) {
 
 	var usr model.Usr
 
-	id := helper.StrToInt64(chi.URLParam(r, "id"))
+	//id := helper.StrToInt64(chi.URLParam(r, "id"))
+	id := helper.StrToInt64(r.URL.Query().Get("id"))
 
 	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
@@ -104,7 +104,8 @@ func UserDelete(w http.ResponseWriter, r *http.Request) {
 
 	var usr model.Usr
 
-	id := helper.StrToInt64(chi.URLParam(r, "id"))
+	//id := helper.StrToInt64(chi.URLParam(r, "id"))
+	id := helper.StrToInt64(r.URL.Query().Get("id"))
 
 	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
@@ -131,7 +132,8 @@ func UserGet(w http.ResponseWriter, r *http.Request) {
 
 	var usr model.Usr
 
-	id := helper.StrToInt64(chi.URLParam(r, "id"))
+	id := helper.StrToInt64(r.URL.Query().Get("id"))
+	//id := helper.StrToInt64(chi.URLParam(r, "id"))
 
 	isExists, err := helper.CheckIfUserExists(id)
 	if err != nil {
