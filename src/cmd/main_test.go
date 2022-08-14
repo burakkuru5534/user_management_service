@@ -78,7 +78,7 @@ func TestList(t *testing.T) {
 				status, http.StatusOK)
 		}
 	} else {
-		expected := `[{"id":35,"name":"burak2","email":"testemail6@gmail.com","password":""},{"id":36,"name":"burak2","email":"testemail7@gmail.com","password":""},{"id":34,"name":"burak3","email":"testemail77@gmail.com","password":""}]
+		expected := `[{"id":36,"name":"burak3","email":"testemail2@gmail.com","password":""},{"id":38,"name":"burak2","email":"testemail7@gmail.com","password":""},{"id":34,"name":"burak3","email":"testemail77@gmail.com","password":""}]
 `
 		if rr.Body.String() != expected {
 			t.Errorf("handler returned unexpected body: got %v want %v",
@@ -202,7 +202,7 @@ func TestGet(t *testing.T) {
 		errors.New("init app error.")
 	}
 
-	req, err := http.NewRequest("GET", "/api/users", nil)
+	req, err := http.NewRequest("GET", "/api/user", nil)
 	if err != nil {
 		t.Fatal(err)
 	}

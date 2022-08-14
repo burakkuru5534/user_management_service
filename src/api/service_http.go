@@ -26,10 +26,10 @@ func HttpService() http.Handler {
 		mr.Group(func(r chi.Router) {
 			//r.Get("/users/{id}", UserGet)
 			r.Post("/users", UserCreate)
-			r.Patch("/users/{id}", UserUpdate)
+			r.Patch("/users", UserUpdate)
 			r.Get("/users", UserList)
-			r.Get("/users/{id}", UserGet)
-			r.Delete("/users/{id}", UserDelete)
+			r.Get("/user", UserGet)
+			r.Delete("/users", UserDelete)
 		})
 	})
 
