@@ -131,7 +131,6 @@ request Body Example:
 
  ```json
 {
-  "id": 1,
   "name":"Updated Name",
   "email":"updatedemail@gmail.com",
   "password":"updatedPass"
@@ -143,6 +142,7 @@ response example:
 for 200:
  ```json
 {
+  "id": 1,
   "name":"Updated Name",
   "email":"updatedemail@gmail.com",
   "password":"updatedPass"
